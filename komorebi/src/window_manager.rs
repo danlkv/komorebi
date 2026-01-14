@@ -2222,8 +2222,40 @@ impl WindowManager {
                     }
                 }
             }
-            Some(idx) => {
+            Some(mut idx) => {
                 let workspace = self.focused_workspace_mut()?;
+                let current_idx = workspace.focused_container_idx();
+
+                // Handle UltrawideVerticalStack tertiary column memory
+                if matches!(workspace.layout, Layout::Default(DefaultLayout::UltrawideVerticalStack)) {
+                    match direction {
+                        OperationDirection::Left => {
+                            // Moving left from tertiary (idx > 1) to primary (idx 0)
+                            // Save the current position to restore later
+                            if current_idx > 1 && idx == 0 {
+                                workspace.tertiary_restore_idx = Some(current_idx);
+                            }
+                            // Clear saved index if moving to secondary (idx 1)
+                            if idx == 1 {
+                                workspace.tertiary_restore_idx = None;
+                            }
+                        }
+                        OperationDirection::Right => {
+                            // Moving right from primary (idx 0) to tertiary
+                            // Restore the saved position if available
+                            if current_idx == 0 && idx == 2 {
+                                if let Some(restore_idx) = workspace.tertiary_restore_idx {
+                                    // Only use the restore index if it's still valid
+                                    if restore_idx < workspace.containers().len() {
+                                        idx = restore_idx;
+                                    }
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+
                 workspace.focus_container(idx);
             }
         }
@@ -3195,6 +3227,10 @@ impl WindowManager {
         }
 
         workspace.layout = Layout::Default(layout);
+        // Clear tertiary restore index when changing away from UltrawideVerticalStack
+        if !matches!(layout, DefaultLayout::UltrawideVerticalStack) {
+            workspace.tertiary_restore_idx = None;
+        }
         self.update_focused_workspace(self.mouse_follows_focus, false)
     }
 
@@ -3214,6 +3250,10 @@ impl WindowManager {
 
                 tracing::info!("next layout: {new_layout}");
                 workspace.layout = Layout::Default(new_layout);
+                // Clear tertiary restore index when changing away from UltrawideVerticalStack
+                if !matches!(new_layout, DefaultLayout::UltrawideVerticalStack) {
+                    workspace.tertiary_restore_idx = None;
+                }
             }
             Layout::Custom(_) => {}
         }
@@ -3249,6 +3289,8 @@ impl WindowManager {
 
         workspace.layout = Layout::Custom(layout);
         workspace.layout_flip = None;
+        // Clear tertiary restore index when changing to custom layout
+        workspace.tertiary_restore_idx = None;
         self.update_focused_workspace(self.mouse_follows_focus, false)
     }
 

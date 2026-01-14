@@ -4,7 +4,32 @@ Changes:
 
 1. Remove the MDM splash screen. I don't use komorebi for work, but I do want
    to check work emails from time to time, which requires a work account.
+2. In UltraWideStack layout, the focused window location in right stack is preserved.
 
+```txt
+ Tertiary Column (idx 2, 3, 4...)
+  ┌─────────┬──────────┬─────────┐
+  │         │          │   2     │
+  │    1    │    0     ├─────────┤  Focus on idx 3
+  │secondary│ primary  │   3  ←  │
+  │         │          ├─────────┤
+  │         │          │   4     │
+  └─────────┴──────────┴─────────┘
+
+  Move LEFT → idx 0 (saves: 3)
+  ┌─────────┬──────────┬─────────┐
+  │         │          │   2     │
+  │    1    │    0  ←  │   3     │
+  │secondary│ primary  │   4     │
+  └─────────┴──────────┴─────────┘
+
+  Move RIGHT → idx 3 (restored!)
+  ┌─────────┬──────────┬─────────┐
+  │         │          │   2     │
+  │    1    │    0     │   3  ←  │
+  │secondary│ primary  │   4     │
+  └─────────┴──────────┴─────────┘
+```
 
 The original README.md follows below
 

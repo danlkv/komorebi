@@ -1,3 +1,15 @@
+# danlkv's fork of komorebi
+
+Changes:
+
+1. Remove the MDM splash screen. I don't use komorebi for work, but I do want
+   to check work emails from time to time, which requires a work account.
+
+
+The original README.md follows below
+
+---
+
 # komorebi
 
 Tiling Window Management for Windows.

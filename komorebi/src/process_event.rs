@@ -28,8 +28,6 @@ use crate::border_manager::BORDER_OFFSET;
 use crate::border_manager::BORDER_WIDTH;
 use crate::current_virtual_desktop;
 use crate::notify_subscribers;
-use crate::splash;
-use crate::splash::mdm_enrollment;
 use crate::stackbar_manager;
 use crate::state::State;
 use crate::transparency_manager;
@@ -45,6 +43,7 @@ use crate::workspace::WorkspaceLayer;
 pub fn listen_for_events(wm: Arc<Mutex<WindowManager>>) {
     let receiver = wm.lock().incoming_events.clone();
 
+    /* Disable MDM enrollement check. 
     std::thread::spawn(|| {
         loop {
             if let Ok((mdm, server)) = mdm_enrollment() {
@@ -64,6 +63,7 @@ pub fn listen_for_events(wm: Arc<Mutex<WindowManager>>) {
             std::thread::sleep(std::time::Duration::from_secs(14400));
         }
     });
+    */
 
     std::thread::spawn(move || {
         tracing::info!("listening");
